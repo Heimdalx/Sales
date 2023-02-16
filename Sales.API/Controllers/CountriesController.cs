@@ -9,8 +9,10 @@ namespace Sales.API.Controllers
     [Route("/api/countries")]
     public class CountriesController : ControllerBase
     {
+        //campos
         private readonly DataContext _context;
 
+        //Constructor
         public CountriesController(DataContext context)
         {
             _context = context;
