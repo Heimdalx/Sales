@@ -7,11 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Shared\GenericList.razor.css" />
+    <None Remove="Shared\GenericLoading.razor.css" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Shared\GenericList.razor.css" />
+    <Content Include="Shared\GenericLoading.razor.css" />
   </ItemGroup>
 
   <ItemGroup>
