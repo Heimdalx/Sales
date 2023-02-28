@@ -36,9 +36,9 @@ namespace Sales.API.Data
         {
             if (!_context.Categories.Any())
             {
-                _context.Categories.Add(new Category { Name = "Violines" });
-                _context.Categories.Add(new Category { Name = "Guitarras" });
-                _context.Categories.Add(new Category { Name = "Baterias" });
+                _context.Categories.Add(new Category { Name = "Frutas" });
+                _context.Categories.Add(new Category { Name = "Carnes" });
+                _context.Categories.Add(new Category { Name = "Verduras" });
                 await _context.SaveChangesAsync();
             }
 

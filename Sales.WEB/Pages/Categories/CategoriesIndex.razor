@@ -12,7 +12,7 @@
             <thead>
                 <tr>
                     <th></th>
-                    <th>País</th>
+                    <th>Categoría</th>
                 </tr>
             </thead>
             <tbody>
@@ -73,7 +73,7 @@
         }
 
         await LoadingAsync();
-        await sweetAlertService.FireAsync("Completado", $"El país {category.Name} se eliminó correctamente", SweetAlertIcon.Success);
+        await sweetAlertService.FireAsync("Completado", $"La categoría {category.Name} se eliminó correctamente", SweetAlertIcon.Success);
 
     }
 
