@@ -27,6 +27,7 @@
                             @country.StatesNumber
                         </td>
                         <td>
+                            <a class="btn btn-info" href="/countries/details/@country.Id">Detalles</a>
                             <a class="btn btn-warning" href="/countries/edit/@country.Id">Editar</a>
                             <button class="btn btn-danger" @onclick="@(() => DeleteAsync(country))">Borrar</button>
                         </td>
@@ -77,7 +78,7 @@
         }
 
         await LoadingAsync();
-        await sweetAlertService.FireAsync("Comletado", $"El país {country.Name} se eliminó correctamente", SweetAlertIcon.Success);
+        await sweetAlertService.FireAsync("Completado", $"El país {country.Name} se eliminó correctamente", SweetAlertIcon.Success);
         
     }
 
