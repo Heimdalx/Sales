@@ -10,9 +10,10 @@
     <Body>
         <table class="table table-striped">
         <thead>
-            <tr>
-                <th></th>
-                <th>País</th>
+                <tr>
+                    <th>País</th>
+                    <th>Estados/Departamentos</th>
+                    <th></th>
             </tr>
     </thead>
         <tbody>
@@ -20,11 +21,14 @@
                 {
                     <tr>
                         <td>
-                            <a class="btn btn-warning" href="/countries/edit/@country.Id">Editar</a>
-                            <button class="btn btn-danger" @onclick="@(() => DeleteAsync(country))">Borrar</button>
+                            @country.Name
                         </td>
                         <td>
-                            @country.Name
+                            @country.StatesNumber
+                        </td>
+                        <td>
+                            <a class="btn btn-warning" href="/countries/edit/@country.Id">Editar</a>
+                            <button class="btn btn-danger" @onclick="@(() => DeleteAsync(country))">Borrar</button>
                         </td>
                     </tr>
                 }

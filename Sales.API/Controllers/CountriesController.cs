@@ -40,12 +40,22 @@ namespace Sales.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-
+       
         [HttpGet]
         public async Task<ActionResult> GetAsync()
         {
-            return Ok(await _context.Countries.ToListAsync());
+            return Ok(await _context.Countries
+                .Include(country => country.States!)
+                .ToListAsync());
+        }
+
+        [HttpGet("full")]
+        public async Task<ActionResult> GetFullAsync()
+        {
+            return Ok(await _context.Countries
+                .Include(country => country.States!)
+                .ThenInclude(state => state.Cities)
+                .ToListAsync());
         }
 
         [HttpGet("{id:int}")]
