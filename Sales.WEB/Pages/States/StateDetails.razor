@@ -1,46 +1,41 @@
-﻿@page "/countries/details/{Id:int}"
+﻿@page "/states/details/{StateId:int}"
 @inject IRepository repository;
 @inject NavigationManager navigationManager;
 @inject SweetAlertService sweetAlertService;
 
 
-@if (country is null)
+@if (state is null)
 {
     <GenericLoading />
 }
 else
 {
 
-    <h3>@country.Name</h3>
+    <h3>@state.Name</h3>
     <div class="mb-2">
-        <a class="btn btn-primary" href="/states/create/@country.Id">Nuevo estado/departamento</a>
-        <a class="btn btn-success" href="/countries">Regresar</a>
+        <a class="btn btn-primary" href="/cities/create/@state.Id">Nueva ciudad</a>
+        <a class="btn btn-success" href="/countries/details/@state.CountryId">Regresar</a>
     </div>
 
-    <GenericList MyList="country.States!.ToList()">
+    <GenericList MyList="state.Cities!.ToList()">
         <Body>
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>Estados / Departamentos</th>
                         <th>Ciudades</th>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var state in country.States!.ToList())
+                    @foreach (var city in state.Cities!.ToList())
                     {
                         <tr>
                             <td>
-                                @state.Name
+                                @city.Name
                             </td>
                             <td>
-                                @state.CitiesNumber
-                            </td>
-                            <td>
-                                <a class="btn btn-info" href="/states/details/@state.Id">Detalles</a>
-                                <a class="btn btn-warning" href="/states/edit/@state.Id">Editar</a>
-                                <button class="btn btn-danger" @onclick="@(() => DeleteAsync(state))">Borrar</button>
+                                <a class="btn btn-warning" href="/cities/edit/@city.Id">Editar</a>
+                                <button class="btn btn-danger" @onclick="@(() => DeleteAsync(city))">Borrar</button>
                             </td>
                         </tr>
                     }
@@ -52,10 +47,10 @@ else
 
 
 @code {
-    private Country? country;
+    private State? state;
 
     [Parameter]
-    public int Id { get; set; }
+    public int StateId { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -63,12 +58,12 @@ else
         await LoadingAsync();
     }
 
-    public async Task DeleteAsync(State state)
+    public async Task DeleteAsync(City city)
     {
         var result = await sweetAlertService.FireAsync(new SweetAlertOptions
             {
                 Title = "Confirmación",
-                Text = $"¿Esta seguro de eliminar el estado / departamento {state.Name}?",
+                Text = $"¿Esta seguro de eliminar la ciudad {city.Name}?",
                 Icon = SweetAlertIcon.Question,
                 ShowCancelButton = true,
                 CancelButtonText = "No",
@@ -81,7 +76,7 @@ else
             return;
         }
 
-        var responseHttp = await repository.Delete($"api/states/{state.Id}");
+        var responseHttp = await repository.Delete($"api/cities/{city.Id}");
         if (responseHttp.Error)
         {
             if (responseHttp.HttpResponseMessage.StatusCode != HttpStatusCode.NotFound)
@@ -94,7 +89,7 @@ else
         }
 
         await LoadingAsync();
-        await sweetAlertService.FireAsync("Completado", $"El estado / departamento {state.Name} se eliminó correctamente", SweetAlertIcon.Success);
+        await sweetAlertService.FireAsync("Completado", $"La ciudad {city.Name} se eliminó correctamente", SweetAlertIcon.Success);
 
     }
 
@@ -102,7 +97,7 @@ else
     {
 
 
-        var responseHttp = await repository.Get<Country>($"/api/countries/{Id}");
+        var responseHttp = await repository.Get<State>($"/api/states/{StateId}");
         if (responseHttp.Error)
         {
             if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
@@ -115,7 +110,7 @@ else
             await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
             return;
         }
-        country = responseHttp.Response;
+        state = responseHttp.Response;
     }
 
 }
