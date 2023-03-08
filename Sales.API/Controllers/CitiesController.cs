@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sales.API.Data;
+using Sales.API.Helpers;
+using Sales.Shared.DTOs;
 using Sales.Shared.Entities;
 
 namespace Sales.API.Controllers
@@ -40,22 +42,30 @@ namespace Sales.API.Controllers
             }
         }
 
+
+        
         [HttpGet]
-        public async Task<ActionResult> GetAsync()
+        public async Task<ActionResult> GetAsync([FromQuery] PaginationDTO pagination)
         {
-            return Ok(await _dataContext.Cities.ToListAsync());
+            var queryable = _dataContext.Cities
+                .Where(city => city.StateId == pagination.Id)
+                .AsQueryable();
+
+            return Ok(await queryable
+                .OrderBy(city => city.Name)
+                .Paginate(pagination)
+                .ToListAsync());
         }
 
-
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult> GetAsync(int id)
+        [HttpGet("totalPages")]
+        public async Task<ActionResult> GetPages([FromQuery] PaginationDTO pagination)
         {
-            var city = await _dataContext.Cities.FirstOrDefaultAsync(city => city.Id == id);
-            if (city == null)
-            {
-                return NotFound();
-            }
-            return Ok(city);
+            var queryable = _dataContext.Cities
+                .Where(city => city.StateId == pagination.Id)
+                .AsQueryable();
+            double count = await queryable.CountAsync();
+            double totalPages = Math.Ceiling(count / pagination.RecordsNumber);
+            return Ok(totalPages);
         }
 
         [HttpPut]
