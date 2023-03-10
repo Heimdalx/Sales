@@ -5,7 +5,18 @@
 
 <h3>Paises</h3>
 
-<a class="btn btn-primary mb-2" href="/countries/create">Crear nuevo país</a>
+<div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center;">
+    <div>
+        <a class="btn btn-primary" href="/countries/create">Nuevo País</a>
+    </div>
+    <div class="mx-2">
+        <input style="width: 400px;" type="text" class="form-control" id="titulo" placeholder="Buscar país" @bind-value="Filter" />
+    </div>
+    <div>
+        <button type="button" class="btn btn-outline-primary" @onclick="ApplyFilterAsync">Filtrar</button>
+        <button type="button" class="btn btn-outline-danger" @onclick="CleanFilterAsync">Limpiar</button>
+    </div>
+</div>
 
 <Pagination CurrentPage="currentePage"
             TotalPages="totalPages"
@@ -50,6 +61,15 @@
     private int currentePage = 1;
     private int totalPages;
 
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string Page { get; set; } = string.Empty;
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string Filter { get; set; } = string.Empty;
+
     protected override async Task OnInitializedAsync()
     {
         await LoadingAsync();
@@ -92,9 +112,25 @@
 
     private async Task LoadingAsync(int page = 1)
     {
+        if (!string.IsNullOrWhiteSpace(Page))
+        {
+            page = Convert.ToInt32(Page);
+        }
 
-        string url1 = $"api/countries?page={page}";
-        string url2 = $"api/countries/totalPages";
+        string url1 = string.Empty;
+        string url2 = string.Empty;
+
+        if (string.IsNullOrEmpty(Filter))
+        {
+            url1 = $"api/countries?page={page}";
+            url2 = $"api/countries/totalPages";
+        }
+        else
+        {
+            url1 = $"api/countries?page={page}&filter={Filter}";
+            url2 = $"api/countries/totalPages?filter={Filter}";
+        }
+
 
         var responseHppt = await repository.Get<List<Country>>(url1);
         var responseHppt2 = await repository.Get<int>(url2);
@@ -108,4 +144,17 @@
         currentePage = page;
         await LoadingAsync(page);
     }
+
+    private async Task CleanFilterAsync()
+    {
+        Filter = string.Empty;
+        await ApplyFilterAsync();
+    }
+
+    private async Task ApplyFilterAsync()
+    {
+        await LoadingAsync(1);
+        await SelectedPageAsync(1);
+    }
+
 }

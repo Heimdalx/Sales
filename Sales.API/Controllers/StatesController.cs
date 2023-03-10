@@ -50,6 +50,10 @@ namespace Sales.API.Controllers
                 .Where(state => state.CountryId == pagination.Id)
                 .AsQueryable();
 
+            if (!string.IsNullOrWhiteSpace(pagination.Filter))
+            {
+                queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
+            }
 
             return Ok(await queryable
                 .OrderBy(state => state.Name)
@@ -63,6 +67,10 @@ namespace Sales.API.Controllers
             var queryable = _dataContext.States
                 .Where(state => state.CountryId == pagination.Id)
                 .AsQueryable();
+            if (!string.IsNullOrWhiteSpace(pagination.Filter))
+            {
+                queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
+            }
             double count = await queryable.CountAsync();
             double totalPages = Math.Ceiling(count / pagination.RecordsNumber);
             return Ok(totalPages);

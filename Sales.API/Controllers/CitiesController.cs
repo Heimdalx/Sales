@@ -51,6 +51,11 @@ namespace Sales.API.Controllers
                 .Where(city => city.StateId == pagination.Id)
                 .AsQueryable();
 
+            if (!string.IsNullOrWhiteSpace(pagination.Filter))
+            {
+                queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
+            }
+
             return Ok(await queryable
                 .OrderBy(city => city.Name)
                 .Paginate(pagination)
@@ -63,9 +68,27 @@ namespace Sales.API.Controllers
             var queryable = _dataContext.Cities
                 .Where(city => city.StateId == pagination.Id)
                 .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(pagination.Filter))
+            {
+                queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
+            }
+
             double count = await queryable.CountAsync();
             double totalPages = Math.Ceiling(count / pagination.RecordsNumber);
             return Ok(totalPages);
+        }
+
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult> GetAsync(int id)
+        {
+            var city = await _dataContext.Cities
+                .FirstOrDefaultAsync(city => city.Id == id);
+            if (city == null)
+            {
+                return NotFound();
+            }
+            return Ok(city);
         }
 
         [HttpPut]
