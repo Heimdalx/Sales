@@ -8,32 +8,31 @@ using Sales.Shared.Entities;
 namespace Sales.API.Controllers
 {
     [ApiController]
-    [Route("/api/countries")]
-    public class CountriesController : ControllerBase
+    [Route("/api/cities")]
+    public class CitiesController : ControllerBase
     {
-        //campos
-        private readonly DataContext _context;
+        private readonly DataContext _dataContext;
 
-        //Constructor
-        public CountriesController(DataContext context)
+        public CitiesController(DataContext context)
         {
-            _context = context;
+            _dataContext = context;
         }
 
+
         [HttpPost]
-        public async Task<ActionResult> PostAsync(Country country)
+        public async Task<ActionResult> PostAsync(City cities)
         {
             try
             {
-                _context.Add(country);
-                await _context.SaveChangesAsync();
-                return Ok(country);
+                _dataContext.Add(cities);
+                await _dataContext.SaveChangesAsync();
+                return Ok(cities);
             }
             catch (DbUpdateException ex)
             {
                 if (ex.InnerException!.Message.Contains("duplicate"))
                 {
-                    return BadRequest($"Ya existe un país con el nombre: {country.Name}");
+                    return BadRequest($"Ya existe una ciudad con el nombre: {cities.Name}");
                 }
                 return BadRequest(ex.Message);
             }
@@ -42,12 +41,14 @@ namespace Sales.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+
         
         [HttpGet]
         public async Task<ActionResult> GetAsync([FromQuery] PaginationDTO pagination)
         {
-            var queryable = _context.Countries
-                .Include(country => country.States)
+            var queryable = _dataContext.Cities
+                .Where(city => city.StateId == pagination.Id)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(pagination.Filter))
@@ -55,9 +56,8 @@ namespace Sales.API.Controllers
                 queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
             }
 
-
             return Ok(await queryable
-                .OrderBy(country => country.Name)
+                .OrderBy(city => city.Name)
                 .Paginate(pagination)
                 .ToListAsync());
         }
@@ -65,7 +65,10 @@ namespace Sales.API.Controllers
         [HttpGet("totalPages")]
         public async Task<ActionResult> GetPages([FromQuery] PaginationDTO pagination)
         {
-            var queryable = _context.Countries.AsQueryable();
+            var queryable = _dataContext.Cities
+                .Where(city => city.StateId == pagination.Id)
+                .AsQueryable();
+
             if (!string.IsNullOrWhiteSpace(pagination.Filter))
             {
                 queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
@@ -76,44 +79,32 @@ namespace Sales.API.Controllers
             return Ok(totalPages);
         }
 
-
-        [HttpGet("full")]
-        public async Task<ActionResult> GetFullAsync()
-        {
-            return Ok(await _context.Countries
-                .Include(country => country.States!)
-                .ThenInclude(state => state.Cities)
-                .ToListAsync());
-        }
-
         [HttpGet("{id:int}")]
         public async Task<ActionResult> GetAsync(int id)
         {
-            var country = await _context.Countries
-                .Include(country => country.States!)
-                .ThenInclude(states => states.Cities)
-                .FirstOrDefaultAsync(country => country.Id == id);
-            if(country == null)
+            var city = await _dataContext.Cities
+                .FirstOrDefaultAsync(city => city.Id == id);
+            if (city == null)
             {
                 return NotFound();
             }
-            return Ok(country);
+            return Ok(city);
         }
 
         [HttpPut]
-        public async Task<ActionResult> PutAsync(Country country)
+        public async Task<ActionResult> PutAsync(City city)
         {
             try
             {
-                _context.Update(country);
-                await _context.SaveChangesAsync();
-                return Ok(country);
+                _dataContext.Update(city);
+                await _dataContext.SaveChangesAsync();
+                return Ok(city);
             }
             catch (DbUpdateException ex)
             {
                 if (ex.InnerException!.Message.Contains("duplicate"))
                 {
-                    return BadRequest($"Ya existe un país con el nombre: {country.Name}");
+                    return BadRequest($"Ya existe una ciudad con el nombre: {city.Name}");
                 }
                 return BadRequest(ex.Message);
             }
@@ -126,15 +117,16 @@ namespace Sales.API.Controllers
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> DeleteAsync(int id)
         {
-            var country = await _context.Countries.FirstOrDefaultAsync(country => country.Id == id);
-            if (country == null)
+            var city = await _dataContext.Cities.FirstOrDefaultAsync(city => city.Id == id);
+            if (city == null)
             {
                 return NotFound();
             }
-            _context.Remove(country);
-            await _context.SaveChangesAsync();
+            _dataContext.Remove(city);
+            await _dataContext.SaveChangesAsync();
             return NoContent();
         }
 
     }
 }
+
