@@ -42,8 +42,10 @@
                         Enable = CurrentPage == i,
                         Text = $"{i}"
                     });
+                
             }
         }
+
         var linkNextEnable = CurrentPage != TotalPages;
         var linkNextPage = CurrentPage + 1;
         Links.Add(new PageModel
