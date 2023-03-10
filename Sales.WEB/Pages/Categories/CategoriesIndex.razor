@@ -4,8 +4,23 @@
 @inject SweetAlertService sweetAlertService
 
 <h3>Categorias</h3>
+<div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center;">
+    <div>
+        <a class="btn btn-primary" href="/categories/create">Crear nueva categoria</a>
+    </div>
+    <div class="mx-2">
+        <input style="width: 400px;" type="text" class="form-control" id="titulo" placeholder="Buscar país" @bind-value="Filter" />
+    </div>
+    <div>
+        <button type="button" class="btn btn-outline-primary" @onclick="ApplyFilterAsync">Filtrar</button>
+        <button type="button" class="btn btn-outline-danger" @onclick="CleanFilterAsync">Limpiar</button>
+    </div>
+</div>
 
-<a class="btn btn-primary" href="/categories/create">Crear nueva categoria</a>
+<Pagination CurrentPage="currentePage"
+            TotalPages="totalPages"
+            SelectedPage="SelectedPageAsync" />
+
 <GenericList MyList="Categoria">
     <Body>
         <table class="table table-striped">
@@ -36,6 +51,18 @@
 
 @code {
     public List<Category>? Categoria { get; set; }
+
+    private int currentePage = 1;
+    private int totalPages;
+
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string Page { get; set; } = string.Empty;
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string Filter { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -77,10 +104,46 @@
 
     }
 
-    private async Task LoadingAsync()
+    private async Task LoadingAsync(int page = 1)
     {
+        if (!string.IsNullOrWhiteSpace(Page))
+        {
+            page = Convert.ToInt32(Page);
+        }
 
-        var responseHttp = await repository.Get<List<Category>>("api/categories");
+        string url1 = string.Empty;
+        string url2 = string.Empty;
+
+        if (string.IsNullOrEmpty(Filter))
+        {
+            url1 = $"api/categories?page={page}";
+            url2 = $"api/categories/totalPages";
+        }
+        else
+        {
+            url1 = $"api/categories?page={page}&filter={Filter}";
+            url2 = $"api/categories/totalPages?filter={Filter}";
+        }
+        var responseHttp = await repository.Get<List<Category>>(url1);
+        var responseHppt2 = await repository.Get<int>(url2);
         Categoria = responseHttp.Response;
+        totalPages = responseHppt2.Response!;
+    }
+
+    private async Task SelectedPageAsync(int page)
+    {
+        currentePage = page;
+        await LoadingAsync(page);
+    }
+
+    private async Task CleanFilterAsync()
+    {
+        Filter = string.Empty;
+        await ApplyFilterAsync();
+    }
+
+    private async Task ApplyFilterAsync()
+    {
+        await SelectedPageAsync(1);
     }
 }

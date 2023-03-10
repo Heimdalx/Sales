@@ -19,7 +19,7 @@ namespace Sales.API.Data
         public async Task SeedAsync()
         {
             await _context.Database.EnsureCreatedAsync();
-            await CheckCountriesAsync();
+           // await CheckCountriesAsync();
             await CheckCategoriesAsync();
         }
 
@@ -90,9 +90,27 @@ namespace Sales.API.Data
         {
             if (!_context.Categories.Any())
             {
-                _context.Categories.Add(new Category { Name = "Frutas" });
-                _context.Categories.Add(new Category { Name = "Carnes" });
-                _context.Categories.Add(new Category { Name = "Verduras" });
+                _context.Categories.Add(new Category { Name = "Baterias" });
+                _context.Categories.Add(new Category { Name = "Violines" });
+                _context.Categories.Add(new Category { Name = "Guitarras" });
+                _context.Categories.Add(new Category { Name = "Cellos" });
+                _context.Categories.Add(new Category { Name = "Contrabajos" });
+                _context.Categories.Add(new Category { Name = "Violas" });
+                _context.Categories.Add(new Category { Name = "Bajos" });
+                _context.Categories.Add(new Category { Name = "Clarinetes" });
+                _context.Categories.Add(new Category { Name = "Flautas" });
+                _context.Categories.Add(new Category { Name = "Pianos" });
+                _context.Categories.Add(new Category { Name = "Trompetas" });
+                _context.Categories.Add(new Category { Name = "Saxofones" });
+                _context.Categories.Add(new Category { Name = "Trombones" });
+                _context.Categories.Add(new Category { Name = "Cornos" });
+                _context.Categories.Add(new Category { Name = "Fagots" });
+                _context.Categories.Add(new Category { Name = "Oboes" });
+                _context.Categories.Add(new Category { Name = "Piccolos" });
+                _context.Categories.Add(new Category { Name = "Panderetas" });
+                _context.Categories.Add(new Category { Name = "Timbales" });
+                _context.Categories.Add(new Category { Name = "Maracas" });
+                _context.Categories.Add(new Category { Name = "Congas" });
                 await _context.SaveChangesAsync();
             }
 
